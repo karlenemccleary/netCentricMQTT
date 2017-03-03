@@ -1,0 +1,14 @@
+{
+    "classes": [
+        {
+            "name": "Net-Centric Computing",
+            "code": 421,
+            "department": "CMPSC"
+        },
+        {
+            "name": "MATLAB",
+            "code": 200,
+            "department": "CMPSC"
+        }
+    ]
+}
