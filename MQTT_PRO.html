@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+  <script src="MyMQTT" type="mqtt.js"></script>
+  <!-- drop down menu from W3School -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <!-- JSON to table  
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>-->
+  
+
+  <br>
+  <div class="container">
+    <button type="button" class="btn btn-info" data-toggle="collapse" data-target="#connection">Connection</button>
+    <div id="connection" class="collapse">
+      <p style="border-style: outset">
+        Host
+        <input id="Host" type="text" /> Port
+        <input id="port" type="text" /> Client id
+        <input id="port" type="text" />
+        <br>
+        <button onclick="">Connect</button></p>
+      </p>
+    </div>
+  </div>
+ 
+  <br>
+  <!-- Drop down menue-->
+  <div class="container">  <!-- data target and  id must match -->
+    <button type="button" class="btn btn-info" data-toggle="collapse" data-target="#JSON_Show">Data</button>
+    <div id="JSON_Show" class="collapse">
+  <!-- Drop down menue-->
+       <table class = "tabl" border="2">
+         <!-- <tr>
+            <th><a id="name" onclick="sort()">Name</a> </th>
+            <th> <a id="code" onclick="sort()">Code</a> </th>
+            <th><a id="depart" onclick="sort()">Department</a> </th>
+          </tr>-->
+      </talbe>
+          
+    </div>
+  </div>
+
+  <script>
+
+    function sort()
+    {
+
+    }
+
+  </script>
+
+
+</html>
+
+<!-- 
+  <input id="crl" type="color" />     color selector 
+
+
+
+-->
