@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+
+<head> 
+	<title>CMPSC 421</title>
+<script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.1.1.min.js"></script>
+<script>
+function myFunction() {
+  // Declare variables 
+  var input, filter, table, tr, td, i;
+  table = document.getElementById("myTable");
+  tr = table.getElementsByTagName("tr");
+
+  // Loop through all table rows, and hide those who don't match the search query
+  for (i = 0; i < tr.length; i++) {
+    td = tr[i].getElementsByTagName("td")[1];
+    console.log(td);
+
+  //  if (td.toString() == "<td>JSON</td>") {
+ //   	console.log("YESS")
+ //   } 
+  }
+}
+</script>
+	<style type="text/css">
+		table {
+			width: 600px;
+		}
+		table, th, td {
+			border: 1px solid black;
+		}
+	</style>
+
+</head>
+
+<body onload="myFunction()">
+	<h1> CMPSC 421 Net Centric Computing </h1>
+	<h3> AJAX</h2>
+<table id = "myTable">
+  <tr>
+    <th>Topic</th>
+    <th>Format</th> 
+    <th>TimeStamp</th>
+  </tr>
+    <tr>
+    <td>a/b/c/d</td>
+    <td>JSON</td> 
+    <td>10:40 pm</td>
+  </tr>
+    </tr>
+    <tr>
+    <td>a/b/c/e</td>
+    <td>XML</td> 
+    <td>10:42 pm</td>
+  </tr>
+  <tr>
+    <td>a/b</td>
+    <td>JSON</td> 
+    <td>10:43 pm</td>
+  </tr>
+    <tr>
+    <td>a/b/c</td>
+    <td>JSON</td> 
+    <td>10:47 pm</td>
+  </tr>
+
+    <tr>
+    <td>a/b/c</td>
+    <td>XML</td> 
+    <td>10:49 pm</td>
+  </tr>
+	</table>
+
+<script>
+$("tr:odd").css("background-color", "red");
+//$(("tr":contains("JSON"))).css('color', 'red');
+</script>
+
+
+
+
+</body>
+</html>
