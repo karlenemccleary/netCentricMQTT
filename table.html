@@ -42,29 +42,29 @@ function myFunction() {
     <th>Format</th> 
     <th>TimeStamp</th>
   </tr>
-    <tr>
+    <tr class="a">
     <td>a/b/c/d</td>
     <td>JSON</td> 
     <td>10:40 pm</td>
   </tr>
     </tr>
-    <tr>
+    <tr  class="b">
     <td>a/b/c/e</td>
     <td>XML</td> 
     <td>10:42 pm</td>
   </tr>
-  <tr>
+  <tr  class="a/b">
     <td>a/b</td>
     <td>JSON</td> 
     <td>10:43 pm</td>
   </tr>
-    <tr>
+    <tr  class="a/b/c">
     <td>a/b/c</td>
     <td>JSON</td> 
     <td>10:47 pm</td>
   </tr>
 
-    <tr>
+    <tr  class="a/b/c">
     <td>a/b/c</td>
     <td>XML</td> 
     <td>10:49 pm</td>
@@ -72,8 +72,18 @@ function myFunction() {
 	</table>
 
 <script>
-$("tr:odd").css("background-color", "red");
+var arr = [".a", ".b", ".a/b/c/", ".a/b"]
+var colors = ["red", "blue", "green", "yellow"];
+colors[0] = "red"
+colors[1] = "blue"
+colors[2] = "green"
+colors[3] = "yellow"
+for(i = 0; i < arr.length; i++) {
+	$(arr[i]).css("background-color", colors[i]);
+	}
+//$("tr:odd").css("background-color", "red");
 //$(("tr":contains("JSON"))).css('color', 'red');
+
 </script>
 
 
