@@ -4,7 +4,11 @@
 <head> 
 	<title>CMPSC 421</title>
 <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.1.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.js" type="text/javascript"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js" type="text/javascript"></script>
 <script>
+
+
 function myFunction() {
   // Declare variables 
   var input, filter, table, tr, td, i;
@@ -22,6 +26,7 @@ function myFunction() {
   }
 }
 </script>
+
 	<style type="text/css">
 		table {
 			width: 600px;
@@ -72,17 +77,63 @@ function myFunction() {
 	</table>
 
 <script>
-var arr = [".a", ".b", ".a/b/c/", ".a/b"]
-var colors = ["red", "blue", "green", "yellow"];
-colors[0] = "red"
-colors[1] = "blue"
-colors[2] = "green"
-colors[3] = "yellow"
-for(i = 0; i < arr.length; i++) {
-	$(arr[i]).css("background-color", colors[i]);
-	}
-//$("tr:odd").css("background-color", "red");
-//$(("tr":contains("JSON"))).css('color', 'red');
+
+//var mqtt = require('mqtt')
+//var client  = mqtt.connect('mqtt://test.mosquitto.org')
+ 
+
+    var wsbroker = "test.mosquitto.org";  //mqtt websocket enabled broker
+    var wsport = 8080 // port for above
+    var client = new Paho.MQTT.Client(wsbroker, wsport,
+        "myclientid_" + parseInt(Math.random() * 100, 10));
+
+    client.onConnectionLost = function (responseObject) {
+      console.log("connection lost: " + responseObject.errorMessage);
+    };
+    client.onMessageArrived = function (message) {
+      console.log(message.destinationName, ' -- ', message.payloadString);
+    };
+
+    var options = {
+      timeout: 3,
+      onSuccess: function () {
+        console.log("mqtt connected");
+        // Connection succeeded; subscribe to our topic, you can add multile lines of these
+        client.subscribe('/World', {qos: 1});
+    
+        //use the below if you want to publish to a topic on connect
+        message = new Paho.MQTT.Message("Hello");
+        message.destinationName = "/World";
+        client.send(message);
+  
+      },
+      onFailure: function (message) {
+        console.log("Connection failed: " + message.errorMessage);
+      }
+    };
+  function init() {
+      client.connect(options);
+  }
+
+
+$(document).ready(function(){
+init();
+	var arr = [".a", ".b", ".a/b/c/", ".a/b"]
+	var colors = ["red", "blue", "green", "yellow"];
+	colors[0] = "red"
+	colors[1] = "blue"
+	colors[2] = "green"
+	colors[3] = "yellow"
+	for(i = 0; i < arr.length; i++) {
+		$(arr[i]).css("background-color", colors[i]);
+		}
+	//$("tr:odd").css("background-color", "red");
+	//$(("tr":contains("JSON"))).css('color', 'red');
+
+});
+
+
+
 
 </script>
 
