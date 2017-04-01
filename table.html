@@ -58,18 +58,18 @@ function myFunction() {
     <td>XML</td> 
     <td>10:42 pm</td>
   </tr>
-  <tr  class="a/b">
+  <tr  class="c">
     <td>a/b</td>
     <td>JSON</td> 
     <td>10:43 pm</td>
   </tr>
-    <tr  class="a/b/c">
+    <tr  class="d">
     <td>a/b/c</td>
     <td>JSON</td> 
     <td>10:47 pm</td>
   </tr>
 
-    <tr  class="a/b/c">
+    <tr  class="e">
     <td>a/b/c</td>
     <td>XML</td> 
     <td>10:49 pm</td>
@@ -92,6 +92,7 @@ function myFunction() {
     };
     client.onMessageArrived = function (message) {
       console.log(message.destinationName, ' -- ', message.payloadString);
+      $('#myTable tbody').append('<tr class="a/b/c"><td>' + message.destinationName + '</td><td>'+ message.payloadString +'</td><td>5</td></tr>');
     };
 
     var options = {
@@ -106,6 +107,10 @@ function myFunction() {
         message.destinationName = "/World";
         client.send(message);
   
+         message = new Paho.MQTT.Message("Karlene");
+        message.destinationName = "/World";
+        client.send(message);
+
       },
       onFailure: function (message) {
         console.log("Connection failed: " + message.errorMessage);
@@ -116,16 +121,20 @@ function myFunction() {
   }
 
 
+
 $(document).ready(function(){
 init();
-	var arr = [".a", ".b", ".a/b/c/", ".a/b"]
-	var colors = ["red", "blue", "green", "yellow"];
+	var arr = [".a", ".b", ".c", ".d", ".e"]
+	var colors = ["red", "blue", "green", "yellow", "orange"];
 	colors[0] = "red"
 	colors[1] = "blue"
 	colors[2] = "green"
 	colors[3] = "yellow"
+  colors[4] = "orange"
 	for(i = 0; i < arr.length; i++) {
 		$(arr[i]).css("background-color", colors[i]);
+    $('#myTable tbody').append('<tr class="a/b/c"><td>blahblah</td><td>2</td><td>3</td></tr>');
+    $('#myTable tbody').append('<tr class="a/b/c"><td>blahblah</td><td>2</td><td>3</td></tr>');
 		}
 	//$("tr:odd").css("background-color", "red");
 	//$(("tr":contains("JSON"))).css('color', 'red');
