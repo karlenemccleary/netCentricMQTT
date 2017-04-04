@@ -6,8 +6,15 @@
 <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.1.1.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.js" type="text/javascript"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js" type="text/javascript"></script>
-<script>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.13/css/jquery.dataTables.css">
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.13/js/jquery.dataTables.js"></script>
 
+<script>
+  var table; //Variable to hold table. This is initialized on page load. Use this if you want to modify table
+
+  //Colors and topics arrays. These work alongside eachother to determine color of a topic (indices line up)
+  var colors = ["red", "blue", "green", "yellow", "orange"];
+  var topics = [""];
 
 function myFunction() {
   // Declare variables 
@@ -20,9 +27,6 @@ function myFunction() {
     td = tr[i].getElementsByTagName("td")[1];
     console.log(td);
 
-  //  if (td.toString() == "<td>JSON</td>") {
- //   	console.log("YESS")
- //   } 
   }
 }
 </script>
@@ -42,11 +46,14 @@ function myFunction() {
 	<h1> CMPSC 421 Net Centric Computing </h1>
 	<h3> AJAX</h2>
 <table id = "myTable">
+<thead>
   <tr>
     <th>Topic</th>
     <th>Format</th> 
     <th>TimeStamp</th>
+    </thead>
   </tr>
+  <tbody>
     <tr class="a">
     <td>a/b/c/d</td>
     <td>JSON</td> 
@@ -74,25 +81,37 @@ function myFunction() {
     <td>XML</td> 
     <td>10:49 pm</td>
   </tr>
+  </tbody>
 	</table>
 
 <script>
 
-//var mqtt = require('mqtt')
-//var client  = mqtt.connect('mqtt://test.mosquitto.org')
- 
-
-    var wsbroker = "test.mosquitto.org";  //mqtt websocket enabled broker
+    var wsbroker = "85.119.83.194";  //mqtt websocket enabled broker
     var wsport = 8080 // port for above
     var client = new Paho.MQTT.Client(wsbroker, wsport,
         "myclientid_" + parseInt(Math.random() * 100, 10));
 
+    //handler for loss of connection
     client.onConnectionLost = function (responseObject) {
       console.log("connection lost: " + responseObject.errorMessage);
     };
+
+    //handler for recieval of a message
     client.onMessageArrived = function (message) {
       console.log(message.destinationName, ' -- ', message.payloadString);
-      $('#myTable tbody').append('<tr class="a/b/c"><td>' + message.destinationName + '</td><td>'+ message.payloadString +'</td><td>5</td></tr>');
+   
+        var addedRow = table.row.add([message.destinationName, "JSON", message.payloadString]).draw().node();       
+        var colorIndex = topics.indexOf(message.destinationName)
+
+        //If topic name does not exist yet in the table, add it to the list of topics and color with a new color
+        if(colorIndex == -1) {
+          $(addedRow).css('background-color', colors[topics.length]);
+          topics.push(message.destinationName);
+        }
+        //Otherwise, set color to the current saved color
+        else {
+          $(addedRow).css('background-color', colors[colorIndex]);
+        }     
     };
 
     var options = {
@@ -100,15 +119,25 @@ function myFunction() {
       onSuccess: function () {
         console.log("mqtt connected");
         // Connection succeeded; subscribe to our topic, you can add multile lines of these
-        client.subscribe('/World', {qos: 1});
+        client.subscribe('World', {qos: 1});
+        client.subscribe('Forld', {qos: 1});
+        client.subscribe('Borld', {qos: 1});
     
-        //use the below if you want to publish to a topic on connect
+        //use the below if you want to publish to a topic on connect. or paste to console to send message dynamically
         message = new Paho.MQTT.Message("Hello");
-        message.destinationName = "/World";
+        message.destinationName = "World";
         client.send(message);
-  
-         message = new Paho.MQTT.Message("Karlene");
-        message.destinationName = "/World";
+
+        message = new Paho.MQTT.Message("Yooo");
+        message.destinationName = "Forld";
+        client.send(message);
+
+        message = new Paho.MQTT.Message("Hey");
+        message.destinationName = "Borld";
+        client.send(message);
+
+        message = new Paho.MQTT.Message("Oh...");
+        message.destinationName = "Forld";
         client.send(message);
 
       },
@@ -124,30 +153,8 @@ function myFunction() {
 
 $(document).ready(function(){
 init();
-	var arr = [".a", ".b", ".c", ".d", ".e"]
-	var colors = ["red", "blue", "green", "yellow", "orange"];
-	colors[0] = "red"
-	colors[1] = "blue"
-	colors[2] = "green"
-	colors[3] = "yellow"
-  colors[4] = "orange"
-	for(i = 0; i < arr.length; i++) {
-		$(arr[i]).css("background-color", colors[i]);
-    $('#myTable tbody').append('<tr class="a/b/c"><td>blahblah</td><td>2</td><td>3</td></tr>');
-    $('#myTable tbody').append('<tr class="a/b/c"><td>blahblah</td><td>2</td><td>3</td></tr>');
-		}
-	//$("tr:odd").css("background-color", "red");
-	//$(("tr":contains("JSON"))).css('color', 'red');
-
+  table = $('#myTable').DataTable(); //Initialize html table to new DataTable format. See https://datatables.net for more info
 });
-
-
-
-
 </script>
-
-
-
-
 </body>
 </html>
