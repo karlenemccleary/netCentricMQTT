@@ -2,12 +2,13 @@
 <html>
 
 <head> 
-	<title>CMPSC 421</title>
+	<title>TechnipFMC Data Transcriber</title>
 <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.1.1.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.js" type="text/javascript"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js" type="text/javascript"></script>
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.13/css/jquery.dataTables.css">
 <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.13/js/jquery.dataTables.js"></script>
+
 
 <script>
   var table; //Variable to hold table. This is initialized on page load. Use this if you want to modify table
@@ -43,46 +44,22 @@ function myFunction() {
 </head>
 
 <body onload="myFunction()">
-	<h1> CMPSC 421 Net Centric Computing </h1>
-	<h3> AJAX</h2>
+	<h1> TechnipFMC Data Transcriber </h1>
+  <image src="technipfmc.jpg" style="height:200px;">
 <table id = "myTable">
 <thead>
   <tr>
     <th>Topic</th>
     <th>Format</th> 
-    <th>TimeStamp</th>
+    <th>Data</th>
     </thead>
   </tr>
   <tbody>
-    <tr class="a">
-    <td>a/b/c/d</td>
-    <td>JSON</td> 
-    <td>10:40 pm</td>
-  </tr>
-    </tr>
-    <tr  class="b">
-    <td>a/b/c/e</td>
-    <td>XML</td> 
-    <td>10:42 pm</td>
-  </tr>
-  <tr  class="c">
-    <td>a/b</td>
-    <td>JSON</td> 
-    <td>10:43 pm</td>
-  </tr>
-    <tr  class="d">
-    <td>a/b/c</td>
-    <td>JSON</td> 
-    <td>10:47 pm</td>
-  </tr>
-
-    <tr  class="e">
-    <td>a/b/c</td>
-    <td>XML</td> 
-    <td>10:49 pm</td>
-  </tr>
+   
   </tbody>
 	</table>
+
+  <pre id = "rowDetails"></pre>
 
 <script>
 
@@ -99,8 +76,12 @@ function myFunction() {
     //handler for recieval of a message
     client.onMessageArrived = function (message) {
       console.log(message.destinationName, ' -- ', message.payloadString);
-   
-        var addedRow = table.row.add([message.destinationName, "JSON", message.payloadString]).draw().node();       
+        var type = "String";
+        //***Trivial method to determine if message is of type JSON. must be a better way to do this***
+        if(message.payloadString[0] == '{') {
+          type = "JSON";
+        }
+        var addedRow = table.row.add([message.destinationName, type, message.payloadString]).draw().node();       
         var colorIndex = topics.indexOf(message.destinationName)
 
         //If topic name does not exist yet in the table, add it to the list of topics and color with a new color
@@ -140,6 +121,14 @@ function myFunction() {
         message.destinationName = "Forld";
         client.send(message);
 
+        var jsonObj = {"firstName" : "Bob", "lastName" : "Smith"};
+        message = new Paho.MQTT.Message(JSON.stringify(jsonObj));
+        message.destinationName = "Forld";
+        client.send(message);
+        console.log(JSON.stringify(jsonObj));
+        console.log(JSON.stringify(jsonObj, null, 2));
+
+
       },
       onFailure: function (message) {
         console.log("Connection failed: " + message.errorMessage);
@@ -154,6 +143,19 @@ function myFunction() {
 $(document).ready(function(){
 init();
   table = $('#myTable').DataTable(); //Initialize html table to new DataTable format. See https://datatables.net for more info
+  $('#myTable tbody').on('click', 'tr', function () {
+        var rowData = table.row(this).data();
+      //  console.log(rowData[2]);
+
+        if(rowData[1] == "JSON") {
+            document.getElementById("rowDetails").innerHTML = JSON.stringify(JSON.parse(rowData[2]), null, 2);
+            //document.getElementById("rowDetails").innerHTML = rowData[2];
+          //  console.log(JSON.stringify(JSON.parse(rowData[2]), null, 2));
+        }
+        else {
+          document.getElementById("rowDetails").innerHTML = rowData[2];
+        }
+    });
 });
 </script>
 </body>
