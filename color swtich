@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+
+
+
+    <!--make tr color change-->
+<div>
+    Color Selector:
+    <input id="background-color" type="color"/> 
+    <br>
+    Topic Name:
+    <input type="text" id="topicNameColor" value = "Type topic name here">
+    <button onclick= "colorSeleced()">Set Color</button>
+    </input>
+</div>
+
+
+<table >
+  <tr class = "tr1"> 
+    <th>Month</th>
+    <th>Savings</th>
+  </tr>
+  <tr class = "tr1">
+    <td>January</td>
+    <td>$100</td>
+  </tr>
+   <tr class = "tr2">
+    <td>January</td>
+    <td>$100</td>
+  </tr>
+</table>
+
+    <script> 
+    
+    function colorSeleced()
+    {  //textbox for find topic name 
+       var crt = document.getElementById("background-color").value;
+       //get topicname with class
+       var topciname = document.getElementById("topicNameColor").value;
+       console.log(topciname);
+       //set topicname as class
+       var topictar = document.getElementsByClassName(topciname);
+       for(var i =0; i < topictar.length;i++)
+       {
+           topictar[i].style.backgroundColor = crt;
+       }
+      
+    }
+    </script>
+</html>
