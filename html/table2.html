@@ -89,10 +89,13 @@ function myFunction() {
     }
     </script>
 <script>
- setInterval(, 3000);
+ 
 
     //handler for recieval of a message
     function processMessage(message) {
+      console.log(message)
+      /*
+      return;
       console.log(message.destinationName, ' -- ', message.payloadString);
         var type = "String";
         //***Trivial method to determine if message is of type JSON. must be a better way to do this***
@@ -111,10 +114,15 @@ function myFunction() {
         else {
           $(addedRow).css('background-color', colors[colorIndex]).attr('class',message.destinationName);
         }     
+        */
+        var addedRow = table.row.add(["Borld", "string", message]).draw().node();    
     };
 
-function httpGetAsync(theUrl, callback)
+
+function httpGetAsync()
 {
+  var theUrl = "http://localhost:8080/findUser";
+  var callback = processMessage;
 console.log("starting get request")
     var xmlHttp = new XMLHttpRequest();
     xmlHttp.onreadystatechange = function() { 
@@ -130,10 +138,11 @@ console.log("fnishing get request")
 console.log("fnishing get request")
 }
 
-
 $(document).ready(function(){
 //httpGetAsync("http://httpbin.org/get", processMessage);
-httpGetAsync("http://localhost:8080/findUser", null);
+//httpGetAsync("http://localhost:8080/findUser", processMessage);
+
+  
   table = $('#myTable').DataTable(); //Initialize html table to new DataTable format. See https://datatables.net for more info
   $('#myTable tbody').on('click', 'tr', function () {
         var rowData = table.row(this).data();
@@ -148,6 +157,7 @@ httpGetAsync("http://localhost:8080/findUser", null);
           document.getElementById("rowDetails").innerHTML = rowData[2];
         }
     });
+  setInterval(httpGetAsync, 3000);
 });
 </script>
 </body>
