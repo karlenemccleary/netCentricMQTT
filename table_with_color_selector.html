@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+
+<head> 
+	<title>TechnipFMC Data Transcriber</title>
+<script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.1.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.js" type="text/javascript"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js" type="text/javascript"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.13/css/jquery.dataTables.css">
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.13/js/jquery.dataTables.js"></script>
+
+
+<script>
+  var table; //Variable to hold table. This is initialized on page load. Use this if you want to modify table
+  //Colors and topics arrays. These work alongside eachother to determine color of a topic (indices line up)
+  var colors = ["red", "blue", "green", "yellow", "orange"];
+  var topics = [""];
+function myFunction() {
+  // Declare variables 
+  var input, filter, table, tr, td, i;
+  table = document.getElementById("myTable");
+  tr = table.getElementsByTagName("tr");
+  // Loop through all table rows, and hide those who don't match the search query
+  for (i = 0; i < tr.length; i++) {
+    td = tr[i].getElementsByTagName("td")[1];
+    console.log(td);
+  }
+}
+</script>
+
+	<style type="text/css">
+		table {
+			width: 600px;
+		}
+		table, th, td {
+			border: 1px solid black;
+		}
+	</style>
+
+</head>
+
+<body onload="myFunction()">
+	<h1> TechnipFMC Data Transcriber </h1>
+  <image src="technipfmc.jpg" style="height:200px;">
+<table id = "myTable">
+<thead>
+  <tr>
+    <th>Topic</th>
+    <th>Format</th> 
+    <th>Data</th>
+    </thead>
+  </tr>
+  <tbody>
+   
+  </tbody>
+	</table>
+
+  <pre id = "rowDetails"></pre>
+
+<script>
+    var wsbroker = "85.119.83.194";  //mqtt websocket enabled broker
+    var wsport = 8080 // port for above
+    var client = new Paho.MQTT.Client(wsbroker, wsport,
+        "myclientid_" + parseInt(Math.random() * 100, 10));
+    //handler for loss of connection
+    client.onConnectionLost = function (responseObject) {
+      console.log("connection lost: " + responseObject.errorMessage);
+    };
+    //handler for recieval of a message
+    client.onMessageArrived = function (message) {
+      console.log(message.destinationName, ' -- ', message.payloadString);
+        var type = "String";
+        //***Trivial method to determine if message is of type JSON. must be a better way to do this***
+        if(message.payloadString[0] == '{') {
+          type = "JSON";
+        }
+        var addedRow = table.row.add([message.destinationName, type, message.payloadString]).draw().node();       
+        var colorIndex = topics.indexOf(message.destinationName)
+        //If topic name does not exist yet in the table, add it to the list of topics and color with a new color
+        if(colorIndex == -1) {
+          $(addedRow).css('background-color', colors[topics.length]).attr('class',message.destinationName);
+          topics.push(message.destinationName);
+        }
+        //Otherwise, set color to the current saved color
+        else {
+          $(addedRow).css('background-color', colors[colorIndex]).attr('class',message.destinationName);;
+        }     
+    };
+    var options = {
+      timeout: 3,
+      onSuccess: function () {
+        console.log("mqtt connected");
+        // Connection succeeded; subscribe to our topic, you can add multile lines of these
+        client.subscribe('World', {qos: 1});
+        client.subscribe('Forld', {qos: 1});
+        client.subscribe('Borld', {qos: 1});
+    
+        //use the below if you want to publish to a topic on connect. or paste to console to send message dynamically
+        message = new Paho.MQTT.Message("Hello");
+        message.destinationName = "World";
+        client.send(message);
+        message = new Paho.MQTT.Message("Yooo");
+        message.destinationName = "Forld";
+        client.send(message);
+        message = new Paho.MQTT.Message("Hey");
+        message.destinationName = "Borld";
+        client.send(message);
+        message = new Paho.MQTT.Message("Oh...");
+        message.destinationName = "Forld";
+        client.send(message);
+        var jsonObj = {"firstName" : "Bob", "lastName" : "Smith"};
+        message = new Paho.MQTT.Message(JSON.stringify(jsonObj));
+        message.destinationName = "Forld";
+        client.send(message);
+        console.log(JSON.stringify(jsonObj));
+        console.log(JSON.stringify(jsonObj, null, 2));
+      },
+      onFailure: function (message) {
+        console.log("Connection failed: " + message.errorMessage);
+      }
+    };
+  function init() {
+      client.connect(options);
+  }
+$(document).ready(function(){
+init();
+  table = $('#myTable').DataTable(); //Initialize html table to new DataTable format. See https://datatables.net for more info
+  $('#myTable tbody').on('click', 'tr', function () {
+        var rowData = table.row(this).data();
+      //  console.log(rowData[2]);
+        if(rowData[1] == "JSON") {
+            document.getElementById("rowDetails").innerHTML = JSON.stringify(JSON.parse(rowData[2]), null, 2);
+            //document.getElementById("rowDetails").innerHTML = rowData[2];
+          //  console.log(JSON.stringify(JSON.parse(rowData[2]), null, 2));
+        }
+        else {
+          document.getElementById("rowDetails").innerHTML = rowData[2];
+        }
+    });
+});
+</script>
+</body>
+
+
+
+<!--Color Selector-->
+<input type ="image" id ="bt_img"  style="height:20px;width:20px; background-color:lightblue;" src ="buton_img.png"onclick="myFunction()">
+<style>
+#crSeclector {
+    width: 350px;
+    padding: 20px;
+    text-align: left;
+    background-color: lightblue;
+    margin-top:20px;
+}
+</style>
+<div id = "crSeclector">
+    Color Selector:
+    <input id="background-color" type="color"/> 
+    <br>
+    Topic Name:
+    <input type="text" id="topicNameColor" value = "Type topic name here">
+    <button onclick= "colorSeleced()">Set Color</button>
+    </input>
+</div>
+<!--Color Selector Script-->
+
+<script> 
+    function myFunction() {
+    var x = document.getElementById('crSeclector');
+    if (x.style.display === 'none') {
+        x.style.display = 'block';
+        } else {
+        x.style.display = 'none';
+        }
+    }
+    function colorSeleced()
+    {  //textbox for find topic name 
+       var crt = document.getElementById("background-color").value;
+       //get topicname with class
+       var topciname = document.getElementById("topicNameColor").value;
+       console.log(topciname);
+       //set topicname as class
+       var topictar = document.getElementsByClassName(topciname);
+       for(var i =0; i < topictar.length;i++)
+       {
+           topictar[i].style.backgroundColor = crt;
+       }
+      
+    }
+    </script>
+</html>
