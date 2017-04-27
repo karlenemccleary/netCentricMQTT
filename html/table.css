@@ -1,0 +1,81 @@
+#grad {
+   	background: #87CEFA; 
+}
+
+#header{
+	color: white;
+}
+
+#technip{
+	display: inline-block;
+	
+}
+
+#select{
+	float: right;
+	display: inline-block;
+	vertical-align: top;
+	border: 5px;
+	border-color: white;
+	border-style: groove;
+	border-radius: 5px;
+	padding: 10px;
+	margin: 10px;
+}
+
+#rowHeader{
+	font-size: 16px;
+	color: #404040;
+}
+
+
+#rowDetails{
+
+	font-size: 16px;
+	color: #404040;
+}
+
+#rowCon{
+	border: 5px;
+	background-color: #e6f9ff;
+	border-color: white;
+	border-style: groove;
+	border-radius: 5px;
+	padding: 10px;
+	margin: 10px;
+}
+
+
+table.dataTable.no-footer
+{
+	border-bottom: 7px solid #006699;
+	background-color: #e6f9ff;
+}
+
+tr.row_selected td{outline:yellow solid 2px !important;}
+
+table.dataTable {
+  width: 99%;
+}
+
+.datagrid table { 
+	border-collapse: collapse; 
+	text-align: left; 
+	width: 100%; 
+	margin: 10px;
+	border-radius: 20px;
+	border-right: 7px solid #006699;
+}
+ .datagrid {
+ 	font: normal 18px/150% Georgia, Times New Roman, Times, serif; 
+ 	background: #fff; 
+ 	overflow: hidden; 
+ 	border: 7px solid #006699;  
+ 	border-radius: 20px; 
+}
+
+
+   div.dhtmlx_window_active,
+    div.dhx_modal_cover_dv { 
+    	position: fixed !important; 
+}

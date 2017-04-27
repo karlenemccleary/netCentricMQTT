@@ -2,12 +2,14 @@
 <html>
 
 <head> 
+	
 	<title>TechnipFMC Data Transcriber</title>
 <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.1.1.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.js" type="text/javascript"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js" type="text/javascript"></script>
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.13/css/jquery.dataTables.css">
 <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.13/js/jquery.dataTables.js"></script>
+<link rel="stylesheet" href="/tablecss">
 
 
 <script>
@@ -26,7 +28,7 @@ function myFunction() {
   // Loop through all table rows, and hide those who don't match the search query
   for (i = 0; i < tr.length; i++) {
     td = tr[i].getElementsByTagName("td")[1];
-    console.log(td);
+    //console.log(td);
 
   }
 }
@@ -38,30 +40,23 @@ function myFunction() {
 		}
 		table, th, td {
 			border: 1px solid black;
+     			 table-layout: fixed; 
+     			 word-wrap:break-word; 
+     			 word-break: break-all;
+      			text-overflow: ellipsis;
 		}
 	</style>
 
 </head>
 
-<body onload="myFunction()">
-	<h1> TechnipFMC Data Transcriber </h1>
-  <image src="/logo" style="height:200px;">
-<table id = "myTable">
-<thead>
-  <tr>
-    <th>Topic</th>
-    <th>Format</th> 
-    <th>Data</th>
-    </thead>
-  </tr>
-  <tbody>
-   
-  </tbody>
-	</table>
+<body id="grad" onload="myFunction()">
+	<h1 id="header"> TechnipFMC Data Transcriber </h1>
 
-  <pre id = "rowDetails"></pre>
+  <div id="technip"><image src="/logo" style="height:200px;">
+</div>
+
 <!--color selector -->
-<div>
+<div id="select">
     Color Selector:
     <input id="background-color" type="color"/> 
     <br>
@@ -70,9 +65,28 @@ function myFunction() {
     <button onclick= "colorSeleced()">Set Color</button>
     </input>
 </div>
+
+<table id = "myTable" class="datagrid">
+<thead>
+  <tr>
+    <th>Topic</th>
+    <th>Format</th> 
+    <th>Data</th>
+    <th>Date/Time</th>
+    </thead>
+  </tr>
+  <tbody>
+   
+  </tbody>
+	</table>
+	<div id="rowCon">
+<h3 id="rowHeader">More Details:</h3>
+  <pre id = "rowDetails"></pre>
+	</div>
+
 <!--color selector handler -->
   <script> 
-    
+    var storedMessages = [];
     function colorSeleced()
     {  //textbox for find topic name 
        var crt = document.getElementById("background-color").value;
@@ -87,53 +101,79 @@ function myFunction() {
        }
       
     }
-    </script>
-<script>
+
  
 
     //handler for recieval of a message
-    function processMessage(message) {
-      console.log(message)
-      /*
-      return;
-      console.log(message.destinationName, ' -- ', message.payloadString);
+    function processMessage(message2) {
+//var message = message2[0];
+var serverArr = (JSON.parse(message2)).arr;
+var difference = serverArr.length - storedMessages.length;
+while(difference > 0) {
+	var jsonMessage = serverArr[storedMessages.length];
+
+    //  var jsonMessage = JSON.parse(message);
+	storedMessages.push(jsonMessage);
+     // return;
+      console.log(jsonMessage.destinationName, ' -- ', jsonMessage.payloadString);
+
         var type = "String";
         //***Trivial method to determine if message is of type JSON. must be a better way to do this***
-        if(message.payloadString[0] == '{') {
+        if(jsonMessage.payloadString[0] == '{') {
           type = "JSON";
         }
-        var addedRow = table.row.add([message.destinationName, type, message.payloadString]).draw().node();       
-        var colorIndex = topics.indexOf(message.destinationName)
+
+
+        //parse date and time off of message
+         var index = jsonMessage.payloadString.indexOf(" ");
+         //save message into new string
+         var newMessage = jsonMessage.payloadString.substr(0, index);
+         console.log(newMessage);
+         //message.payloadString = newMessage;
+       // var dateString = jsonMessage.payloadString.substr(index+1, jsonMessage.payloadString.length-1);
+var dateString = jsonMessage.dateTime;
+         console.log(dateString);
+
+
+
+
+        //var addedRow = table.row.add([jsonMessage.destinationName, type, jsonMessage.payloadString]).draw().node();       
+        var colorIndex = topics.indexOf(jsonMessage.destinationName)
 
         //If topic name does not exist yet in the table, add it to the list of topics and color with a new color
         if(colorIndex == -1) {
-          $(addedRow).css('background-color', colors[topics.length]).attr('class',message.destinationName);
-          topics.push(message.destinationName);
+          $(addedRow).css('background-color', colors[topics.length]).attr('class',jsonMessage.destinationName);
+          topics.push(jsonMessage.destinationName);
         }
         //Otherwise, set color to the current saved color
         else {
-          $(addedRow).css('background-color', colors[colorIndex]).attr('class',message.destinationName);
+          $(addedRow).css('background-color', colors[colorIndex]).attr('class',jsonMessage.destinationName);
         }     
-        */
-        var addedRow = table.row.add(["Borld", "string", message]).draw().node();    
+        difference--;
+        //var addedRow = table.row.add(["Borld", "string", jsonMessage.payloadString]).draw().node();    
+	var addedRow = table.row.add([jsonMessage.destinationName, type, jsonMessage.payloadString, dateString]).draw().node();
+	//table.column(3).data().sort();
+//var addedRow = table.row.add([jsonMessage.destinationName, type, jsonMessage.payloadString, dateString]);
+//$('#myTable tbody').prepend(addedRow);
+}
     };
 
 
 function httpGetAsync()
 {
-  var theUrl = "http://localhost:8080/findUser";
+  var theUrl = "http://localhost:8000/findUser";
   var callback = processMessage;
 console.log("starting get request")
     var xmlHttp = new XMLHttpRequest();
     xmlHttp.onreadystatechange = function() { 
         if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
-            callback(xmlHttp.responseText);
+            callback(xmlHttp.response);
     }
     xmlHttp.onerror= function(e) {
         console.log("Error fetching " + url);
     };
 console.log("fnishing get request")
-    xmlHttp.open("GET", theUrl, false); // true for asynchronous 
+    xmlHttp.open("GET", theUrl, true); // true for asynchronous 
     xmlHttp.send();
 console.log("fnishing get request")
 }
@@ -143,11 +183,22 @@ $(document).ready(function(){
 //httpGetAsync("http://localhost:8080/findUser", processMessage);
 
   
-  table = $('#myTable').DataTable(); //Initialize html table to new DataTable format. See https://datatables.net for more info
+  table = $('#myTable').DataTable(
+	 {
+        "order": [[ 3, "desc" ]],
+	columnDefs: [ {
+        targets: 2,
+        render: function ( data, type, row ) {
+            return data.substr( 0, 40 );
+        }
+    	} ]
+    } );
+ //Initialize html table to new DataTable format. See https://datatables.net for more info
   $('#myTable tbody').on('click', 'tr', function () {
         var rowData = table.row(this).data();
       //  console.log(rowData[2]);
-
+	$("#myTable tbody tr").removeClass('row_selected'); 
+	$(this).addClass('row_selected');
         if(rowData[1] == "JSON") {
             document.getElementById("rowDetails").innerHTML = JSON.stringify(JSON.parse(rowData[2]), null, 2);
             //document.getElementById("rowDetails").innerHTML = rowData[2];

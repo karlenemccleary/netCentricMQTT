@@ -9,27 +9,61 @@ var jsonString;
 var jsonArr = [];
 var messageQueue = [];
 
-var client  = mqtt.connect('mqtt://test.mosquitto.org')
- 
+var client  = mqtt.connect('mqtt://85.119.83.194')
+ //var client  = mqtt.connect('mqtt://localhost:1883')
 client.on('connect', function () {
   client.subscribe('presence')
+  client.subscribe('world')
+client.subscribe('apple')
   client.publish('presence', 'Hello mqtt')
   client.publish('presence', 'Eyyyy')
   client.publish('presence', 'What up')
-  client.publish('presence', 'screw you')
+  client.publish('world', 'hi')
+client.publish('apple', '?')
 })
  
 client.on('message', function (topic, message) {
   // message is Buffer 
   console.log(message.toString())
-  messageQueue.push(message);
-  client.end()
+
+   var date = new Date();
+        var dd = date.getDate();
+        var mm = date.getMonth()+1; //January is 0!
+
+        var yyyy = date.getFullYear();
+        if(dd<10){
+          dd='0'+dd;
+        } 
+        if(mm<10){
+          mm='0'+mm;
+        } 
+        var date = mm+'/'+dd+'/'+yyyy;
+        var time = new Date();
+        var hour = time.getHours();
+        var min = time.getMinutes();
+        var s = time.getSeconds();
+        if(hour<10){
+          hour='0'+hour;
+        } 
+        if(min<10){
+          min='0'+min;
+        }
+        if(s<10){
+          s='0'+s;
+        }
+        var time = hour + ":" + min +":"+ s;
+	var dateTime = date + " " + time;
+
+console.log(dateTime);
+var json = {"payloadString": message.toString(), "destinationName": topic, "dateTime": dateTime};
+  messageQueue.push(json);
+  //client.end()
 })
 
 // Function to response with error message
 function returnError(code, message, response) {
 	response.writeHead(code, {'Content-Type': 'text/html'});
-	response.end(message);;
+	response.end(message);
 }
 
 
@@ -48,11 +82,15 @@ function doGET (targetFile, query, response) {
 }
 
 function getMessage(res) {
+
+
 	if(messageQueue.length > 0) {
 		console.log("sending message");
-		var message = messageQueue[0].toString();
-		messageQueue.splice(0, 1);
-		res.send(message);
+		var message = messageQueue[0];
+//console.log(message.topic)
+		//messageQueue.splice(0, 1);
+var json = {"arr": messageQueue};
+		res.send(json);
 
 	}
 }
@@ -146,17 +184,21 @@ function doPUT(targetFile, bodyData, response) {
 
 
 app.get('/', function (req, res) {
-  res.sendFile('P:/Private/Documents/GitHub/netCentricMQTT/html/table2.html');
+  res.sendFile(__dirname + '/html/table2.html');
 })
 
 app.get('/logo', function (req, res) {
-  res.sendFile('P:/Private/Documents/GitHub/netCentricMQTT/jpg/technipfmc.jpg');
+  res.sendFile(__dirname + '/jpg/technipfmc.jpg');
+})
+
+app.get('/tablecss', function (req, res) {
+  res.sendFile(__dirname + '/html/table.css');
 })
 
 app.get('/findUser', function (req, res) {
   getMessage(res);
 })
 
-app.listen(8080, function () {
-  console.log('Example app listening on port 3000!')
+app.listen(8000, function () {
+  console.log('Example app listening on port 8000!')
 })

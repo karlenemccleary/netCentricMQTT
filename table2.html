@@ -133,7 +133,7 @@ console.log("fnishing get request")
 
 $(document).ready(function(){
 //httpGetAsync("http://httpbin.org/get", processMessage);
-httpGetAsync("http://localhost:8080/findUser", null);
+httpGetAsync("http://localhost:8000/findUser", null);
   table = $('#myTable').DataTable(); //Initialize html table to new DataTable format. See https://datatables.net for more info
   $('#myTable tbody').on('click', 'tr', function () {
         var rowData = table.row(this).data();
