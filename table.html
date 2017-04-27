@@ -2,6 +2,7 @@
 <html>
 
 <head> 
+  <link rel="stylesheet" href="table.css">
 	<title>TechnipFMC Data Transcriber</title>
 <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.1.1.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.js" type="text/javascript"></script>
@@ -43,15 +44,16 @@ function myFunction() {
 
 </head>
 
-<body onload="myFunction()">
+<body id="grad" onload="myFunction()">
 	<h1> TechnipFMC Data Transcriber </h1>
-  <image src="technipfmc.jpg" style="height:200px;">
-<table id = "myTable">
+  <div id="technip"><image src="jpg/technipfmc.jpg" style="height:200px;"></div>
+<table id = "myTable" class="datagrid">
 <thead>
   <tr>
     <th>Topic</th>
     <th>Format</th> 
     <th>Data</th>
+    <th>Date/Time</th>
     </thead>
   </tr>
   <tbody>
@@ -81,7 +83,15 @@ function myFunction() {
         if(message.payloadString[0] == '{') {
           type = "JSON";
         }
-        var addedRow = table.row.add([message.destinationName, type, message.payloadString]).draw().node();       
+        //parse date and time off of message
+        var index = message.payloadString.indexOf(" ");
+        //save message into new string
+        var newMessage = message.payloadString.substr(0, index);
+        console.log(newMessage);
+        //message.payloadString = newMessage;
+        var dateString = message.payloadString.substr(index+1, message.payloadString.length-1);
+        console.log(dateString);
+        var addedRow = table.row.add([message.destinationName, type, newMessage, dateString]).draw().node();       
         var colorIndex = topics.indexOf(message.destinationName)
 
         //If topic name does not exist yet in the table, add it to the list of topics and color with a new color
@@ -98,6 +108,32 @@ function myFunction() {
     var options = {
       timeout: 3,
       onSuccess: function () {
+        var date = new Date();
+        var dd = date.getDate();
+        var mm = date.getMonth()+1; //January is 0!
+
+        var yyyy = date.getFullYear();
+        if(dd<10){
+          dd='0'+dd;
+        } 
+        if(mm<10){
+          mm='0'+mm;
+        } 
+        var date = mm+'/'+dd+'/'+yyyy;
+        var time = new Date();
+        var hour = time.getHours();
+        var min = time.getMinutes();
+        var s = time.getSeconds();
+        if(hour<10){
+          hour='0'+hour;
+        } 
+        if(min<10){
+          min='0'+min;
+        }
+        if(s<10){
+          s='0'+s;
+        }
+        var time = hour + ":" + min +":"+ s;
         console.log("mqtt connected");
         // Connection succeeded; subscribe to our topic, you can add multile lines of these
         client.subscribe('World', {qos: 1});
@@ -105,25 +141,31 @@ function myFunction() {
         client.subscribe('Borld', {qos: 1});
     
         //use the below if you want to publish to a topic on connect. or paste to console to send message dynamically
-        message = new Paho.MQTT.Message("Hello");
-        message.destinationName = "World";
+        message = new Paho.MQTT.Message("Hello" + " " + date + " " + time);
+        message.destinationName = "World"; 
+        console.log(message.date);
         client.send(message);
 
-        message = new Paho.MQTT.Message("Yooo");
+        //message = message + " " + today;
+        message = new Paho.MQTT.Message("Yooo" + " " + date + " " + time);
         message.destinationName = "Forld";
+       // message.date = date + " " + time;
         client.send(message);
 
-        message = new Paho.MQTT.Message("Hey");
+        message = new Paho.MQTT.Message("Hey" + " " + date + " " + time);
         message.destinationName = "Borld";
+       // message.date = date + " " + time;
         client.send(message);
 
-        message = new Paho.MQTT.Message("Oh...");
+        message = new Paho.MQTT.Message("Oh..." + " " + date + " " + time);
         message.destinationName = "Forld";
+       // message.date = date + " " + time;
         client.send(message);
 
         var jsonObj = {"firstName" : "Bob", "lastName" : "Smith"};
-        message = new Paho.MQTT.Message(JSON.stringify(jsonObj));
+        message = new Paho.MQTT.Message(JSON.stringify(jsonObj) + " " + date + " " + time);
         message.destinationName = "Forld";
+        //message.date = date + " " + time;
         client.send(message);
         console.log(JSON.stringify(jsonObj));
         console.log(JSON.stringify(jsonObj, null, 2));

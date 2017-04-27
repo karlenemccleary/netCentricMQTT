@@ -22,9 +22,10 @@ client.on('connect', function () {
 client.on('message', function (topic, message) {
   // message is Buffer 
   console.log(message.toString())
+  //messageQueue.push(message);
   messageQueue.push(message);
-  client.end()
-})
+    client.end()
+ })
 
 // Function to response with error message
 function returnError(code, message, response) {
