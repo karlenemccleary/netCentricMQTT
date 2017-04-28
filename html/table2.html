@@ -16,7 +16,7 @@
   var table; //Variable to hold table. This is initialized on page load. Use this if you want to modify table
 
   //Colors and topics arrays. These work alongside eachother to determine color of a topic (indices line up)
-  var colors = ["red", "blue", "green", "yellow", "orange"];
+  var colors = ["red", "blue", "green", "yellow", "orange", "pink", "brown", "khaki", "teal", "cyan"];
   var topics = [""];
 
 function myFunction() {
@@ -88,11 +88,17 @@ function myFunction() {
   <script> 
     var storedMessages = [];
     function colorSeleced()
-    {  //textbox for find topic name 
+    {  
+//textbox for find topic name 
        var crt = document.getElementById("background-color").value;
        //get topicname with class
        var topciname = document.getElementById("topicNameColor").value;
-       console.log(topciname);
+	for(var i = 0; i < topics.length; i++) {
+		if(topciname == topics[i]) {
+			colors[i] = crt;
+		}
+	}
+
        //set topicname as class
        var topictar = document.getElementsByClassName(topciname);
        for(var i =0; i < topictar.length;i++)
@@ -111,59 +117,46 @@ var serverArr = (JSON.parse(message2)).arr;
 var difference = serverArr.length - storedMessages.length;
 while(difference > 0) {
 	var jsonMessage = serverArr[storedMessages.length];
-
-    //  var jsonMessage = JSON.parse(message);
 	storedMessages.push(jsonMessage);
-     // return;
-      console.log(jsonMessage.destinationName, ' -- ', jsonMessage.payloadString);
-
         var type = "String";
-        //***Trivial method to determine if message is of type JSON. must be a better way to do this***
-        if(jsonMessage.payloadString[0] == '{') {
-          type = "JSON";
-        }
+
+	try {
+	   JSON.parse(jsonMessage.payloadString);
+	   type = "JSON"
+	}
+	catch(e) {
+	}
+  
 
 
         //parse date and time off of message
          var index = jsonMessage.payloadString.indexOf(" ");
          //save message into new string
          var newMessage = jsonMessage.payloadString.substr(0, index);
-         console.log(newMessage);
-         //message.payloadString = newMessage;
-       // var dateString = jsonMessage.payloadString.substr(index+1, jsonMessage.payloadString.length-1);
-var dateString = jsonMessage.dateTime;
-         console.log(dateString);
-
-
-
-
-        //var addedRow = table.row.add([jsonMessage.destinationName, type, jsonMessage.payloadString]).draw().node();       
+	var dateString = jsonMessage.dateTime;
+	var addedRow = table.row.add([jsonMessage.destinationName, type, jsonMessage.payloadString, dateString]).draw().node();   
         var colorIndex = topics.indexOf(jsonMessage.destinationName)
 
         //If topic name does not exist yet in the table, add it to the list of topics and color with a new color
         if(colorIndex == -1) {
-          $(addedRow).css('background-color', colors[topics.length]).attr('class',jsonMessage.destinationName);
-          topics.push(jsonMessage.destinationName);
+
+	  topics.push(jsonMessage.destinationName);
+          $(addedRow).css('background-color', colors[topics.length-1]).attr('class',jsonMessage.destinationName);
+          
         }
         //Otherwise, set color to the current saved color
         else {
-          $(addedRow).css('background-color', colors[colorIndex]).attr('class',jsonMessage.destinationName);
+ 	  $(addedRow).css('background-color', colors[colorIndex]).attr('class',jsonMessage.destinationName);
         }     
         difference--;
-        //var addedRow = table.row.add(["Borld", "string", jsonMessage.payloadString]).draw().node();    
-	var addedRow = table.row.add([jsonMessage.destinationName, type, jsonMessage.payloadString, dateString]).draw().node();
-	//table.column(3).data().sort();
-//var addedRow = table.row.add([jsonMessage.destinationName, type, jsonMessage.payloadString, dateString]);
-//$('#myTable tbody').prepend(addedRow);
 }
     };
 
 
 function httpGetAsync()
 {
-  var theUrl = "http://localhost:8000/findUser";
+  var theUrl = "http://localhost:8000/getMessages";
   var callback = processMessage;
-console.log("starting get request")
     var xmlHttp = new XMLHttpRequest();
     xmlHttp.onreadystatechange = function() { 
         if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
@@ -172,10 +165,8 @@ console.log("starting get request")
     xmlHttp.onerror= function(e) {
         console.log("Error fetching " + url);
     };
-console.log("fnishing get request")
     xmlHttp.open("GET", theUrl, true); // true for asynchronous 
     xmlHttp.send();
-console.log("fnishing get request")
 }
 
 $(document).ready(function(){
@@ -201,8 +192,7 @@ $(document).ready(function(){
 	$(this).addClass('row_selected');
         if(rowData[1] == "JSON") {
             document.getElementById("rowDetails").innerHTML = JSON.stringify(JSON.parse(rowData[2]), null, 2);
-            //document.getElementById("rowDetails").innerHTML = rowData[2];
-          //  console.log(JSON.stringify(JSON.parse(rowData[2]), null, 2));
+
         }
         else {
           document.getElementById("rowDetails").innerHTML = rowData[2];

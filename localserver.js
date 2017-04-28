@@ -3,23 +3,29 @@ var app = express()
 var mqtt = require('mqtt')
 var path = require('path');
 
+//mosquitto_pub -t 'zhang/isTheBest' -m 'it is true'
+//mosquitto_pub -t 'zhang/time' -m '{"time": "midnight"}'
+//mosquitto_pub -t 'zhang/stuff' -m 'Something....something...html'
+
 const file = "people.json";
 var jsonString;
 var jsonArr = [];
 var messageQueue = [];
 
-var client  = mqtt.connect('mqtt://85.119.83.194')
- //var client  = mqtt.connect('mqtt://localhost:1883')
+//var client  = mqtt.connect('mqtt://85.119.83.194')
+ var client  = mqtt.connect('mqtt://localhost:1883')
 client.on('connect', function () {
  // client.subscribe('presence')
  // client.subscribe('world')
  // client.subscribe('apple')
-client.subscribe('aiden')
-client.subscribe('karlene')
-client.subscribe('katie')
-client.subscribe('jaechan')
-client.subscribe('rohith')
-
+client.subscribe('zhang/#')
+  client.publish('zhang/class', 'Hello mqtt')
+  client.publish('zhang/presence', '{"firstName" : "Aiden", "lastName": "Something"}')
+  client.publish('zhang/presence', 'What up')
+client.publish('zhang/presence', 'What upWhat upWhat upWhat upWhat up')
+  client.publish('zhang/world', '{"num1":1, "num2":2}')
+ client.publish('zhang/world', 'hi')
+client.publish('zhang/rocks', 'I like turtles.')
 })
  
 client.on('message', function (topic, message) {
